@@ -1,0 +1,182 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "User profile with role management",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["parent", "neonatologist", "audiologist", "slp", "ot", "ophthalmologist", "psychiatrist"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Baby": {
+      "title": "Baby",
+      "description": "Information about the newborn baby",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "dob": { "type": "string", "format": "date" },
+        "gestationalAgeAtBirth": { "type": "number", "description": "Weeks" },
+        "birthWeight": { "type": "number" },
+        "pocdNumber": { "type": "string" },
+        "mrNumber": { "type": "string" },
+        "motherUniqueId": { "type": "string" },
+        "taluk": { "type": "string" },
+        "district": { "type": "string" },
+        "state": { "type": "string" },
+        "region": { "type": "string", "enum": ["Urban", "Rural"] },
+        "socioEconomicStatus": { "type": "string", "enum": ["AAY", "BPL", "APL"] },
+        "religion": { "type": "string" },
+        "parentEducation": { "type": "string" },
+        "numSiblings": { "type": "number" },
+        "deliveryType": { "type": "string", "enum": ["Normal", "Caesarean", "Breech", "Home"] },
+        "hospitalCourse": { "type": "string" },
+        "parents": { "type": "array", "items": { "type": "string" } },
+        "careTeam": { "type": "array", "items": { "type": "string" } },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "dob", "gestationalAgeAtBirth"]
+    },
+    "HearingScreening": {
+      "title": "Hearing Screening",
+      "description": "Comprehensive hearing screening results as per AIISH Newborn Screening Datasheet",
+      "type": "object",
+      "properties": {
+        "babyId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "testType": { "type": "string", "enum": ["TEOAE", "DPOAE", "ABR", "BOA"] },
+        "round": { "type": "string", "enum": ["1st Screening", "2nd Screening"] },
+        "resultLeft": { "type": "string", "enum": ["Pass", "Refer", "Noisy", "CNT", "NOT DONE"] },
+        "resultRight": { "type": "string", "enum": ["Pass", "Refer", "Noisy", "CNT", "NOT DONE"] },
+        "highRiskFactors": { "type": "array", "items": { "type": "string" } },
+        "reflexes": {
+          "type": "object",
+          "properties": {
+            "moro": { "type": "string", "enum": ["Normal", "Abnormal"] },
+            "rooting": { "type": "string", "enum": ["Normal", "Abnormal"] },
+            "babinski": { "type": "string", "enum": ["Normal", "Abnormal"] },
+            "palmar": { "type": "string", "enum": ["Normal", "Abnormal"] },
+            "plantar": { "type": "string", "enum": ["Normal", "Abnormal"] }
+          }
+        },
+        "entFindings": { "type": "string" },
+        "overallResult": { "type": "string", "enum": ["Pass", "Refer"] },
+        "followUpType": { "type": "string", "enum": ["Phone follow up", "Regular follow up", "Not applicable"] },
+        "notes": { "type": "string" },
+        "performedBy": { "type": "string" }
+      },
+      "required": ["babyId", "date", "testType"]
+    },
+    "EyeScreening": {
+      "title": "Eye Screening",
+      "description": "Retinal and fundus examination (ROP staging)",
+      "type": "object",
+      "properties": {
+        "babyId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "stage": { "type": "string" },
+        "zone": { "type": "string" },
+        "plusDisease": { "type": "boolean" },
+        "fundusFindings": { "type": "string" },
+        "followUpDate": { "type": "string", "format": "date" },
+        "performedBy": { "type": "string" }
+      },
+      "required": ["babyId", "date"]
+    },
+    "GrowthRecord": {
+      "title": "Growth Record",
+      "description": "Daily or weekly growth measures",
+      "type": "object",
+      "properties": {
+        "babyId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "weight": { "type": "number", "description": "Grams" },
+        "length": { "type": "number", "description": "cm" },
+        "headCircumference": { "type": "number", "description": "cm" },
+        "recordedBy": { "type": "string" }
+      },
+      "required": ["babyId", "date", "weight"]
+    },
+    "DevelopmentalMilestone": {
+      "title": "Developmental Milestone",
+      "description": "Tracking logs for various therapists",
+      "type": "object",
+      "properties": {
+        "babyId": { "type": "string" },
+        "module": { "type": "string", "enum": ["SLP", "OT", "General"] },
+        "category": { "type": "string", "description": "e.g., Speech, Feeding, Motor, Sensory" },
+        "skill": { "type": "string" },
+        "status": { "type": "string", "enum": ["Achieved", "Emerging", "Not Yet"] },
+        "dateObserved": { "type": "string", "format": "date" },
+        "recordedBy": { "type": "string" }
+      },
+      "required": ["babyId", "module", "skill", "status"]
+    },
+    "MentalHealthCheck": {
+      "title": "Mental Health & Parental Well-being",
+      "description": "Tracking for parental emotional support",
+      "type": "object",
+      "properties": {
+        "babyId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "parentStressLevel": { "type": "number", "description": "1-10 scale" },
+        "notes": { "type": "string" },
+        "supportProvided": { "type": "string" },
+        "recordedBy": { "type": "string" }
+      },
+      "required": ["babyId", "date", "parentStressLevel"]
+    },
+    "StandardizedOutcome": {
+      "title": "Standardized Outcome Assessment",
+      "description": "PARCA-R, SDQ, M-CHAT-R",
+      "type": "object",
+      "properties": {
+        "babyId": { "type": "string" },
+        "assessmentType": { "type": "string", "enum": ["PARCA-R", "SDQ", "M-CHAT-R"] },
+        "date": { "type": "string", "format": "date" },
+        "score": { "type": "object" },
+        "interpretation": { "type": "string" }
+      },
+      "required": ["babyId", "assessmentType", "date"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "UserProfile",
+      "description": "Stores user roles and profiles"
+    },
+    "/babies/{babyId}": {
+      "schema": "Baby",
+      "description": "Core baby information"
+    },
+    "/babies/{babyId}/growth": {
+      "schema": "GrowthRecord",
+      "description": "Growth tracking"
+    },
+    "/babies/{babyId}/hearing": {
+      "schema": "HearingScreening",
+      "description": "Hearing screening logs"
+    },
+    "/babies/{babyId}/eyes": {
+      "schema": "EyeScreening",
+      "description": "Eye screening logs"
+    },
+    "/babies/{babyId}/milestones": {
+      "schema": "DevelopmentalMilestone",
+      "description": "Developmental logs (SLP, OT, Parent)"
+    },
+    "/babies/{babyId}/mentalHealth": {
+      "schema": "MentalHealthCheck",
+      "description": "Parental well-being logs"
+    },
+    "/babies/{babyId}/outcomes": {
+      "schema": "StandardizedOutcome",
+      "description": "Formal outcome assessments"
+    }
+  }
+}
