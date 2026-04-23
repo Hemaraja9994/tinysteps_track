@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global Helpers
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function hasRole(role) {
+      return isSignedIn() && getUserData().role == role;
+    }
+
+    // Validation Helpers
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'role']) &&
+             data.uid == request.auth.uid &&
+             data.email is string &&
+             data.role in ['parent', 'neonatologist', 'audiologist', 'slp', 'ot', 'ophthalmologist', 'psychiatrist'];
+    }
+
+    function isValidBaby(data) {
+      return data.name is string && data.name.size() <= 100 &&
+             data.gestationalAgeAtBirth is number && data.gestationalAgeAtBirth >= 15 && data.gestationalAgeAtBirth <= 45;
+    }
+
+    // --- USERS ---
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(uid) && isValidUser(incoming());
+      allow update: if isOwner(uid) && 
+                      incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'email', 'role', 'isAnonymous']) &&
+                      isValidUser(incoming());
+    }
+
+    // --- BABIES ---
+    match /babies/{babyId} {
+      function isParent() { return isSignedIn() && (request.auth.uid in resource.data.parents || hasRole('parent')); }
+      function isCareTeam() { return isSignedIn() && (request.auth.uid in resource.data.careTeam || hasRole('neonatologist') || hasRole('audiologist') || hasRole('slp') || hasRole('ot') || hasRole('ophthalmologist') || hasRole('psychiatrist')); }
+      
+      allow read: if isParent() || isCareTeam();
+      allow create: if isSignedIn() && isValidId(babyId) && isValidBaby(incoming());
+      allow update: if isCareTeam() || isParent();
+      allow delete: if hasRole('neonatologist') || hasRole('audiologist') || hasRole('ophthalmologist');
+
+      // Sub-collections
+      match /growth/{id} {
+        allow read: if isParent() || isCareTeam();
+        allow write: if isParent() || hasRole('neonatologist');
+      }
+      
+      match /hearing/{id} {
+        allow read: if isParent() || isCareTeam();
+        allow write: if hasRole('audiologist') || hasRole('neonatologist') || hasRole('parent'); 
+      }
+      
+      match /eyes/{id} {
+        allow read: if isParent() || isCareTeam();
+        allow write: if hasRole('ophthalmologist');
+      }
+      
+      match /milestones/{id} {
+        allow read: if isParent() || isCareTeam();
+        allow write: if isParent() || hasRole('slp') || hasRole('ot');
+      }
+      
+      match /mentalHealth/{id} {
+        allow read: if isParent() || hasRole('psychiatrist');
+        allow write: if isParent() || hasRole('psychiatrist');
+      }
+      
+      match /outcomes/{id} {
+        allow read: if isParent() || isCareTeam();
+        allow write: if isCareTeam();
+      }
+    }
+  }
+}
