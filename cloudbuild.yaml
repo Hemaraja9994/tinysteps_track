@@ -1,28 +1,31 @@
 substitutions:
   _REGION: us-west1
   _SERVICE: tinysteps
-  # Override this at build time:
-  #   gcloud builds submit --substitutions=_GEMINI_API_KEY=your-key
-  # Leave blank to build without AI interpretation support.
+  # To enable AI interpretation, pass your key at submit time:
+  #   gcloud builds submit --substitutions=_GEMINI_API_KEY=your-key .
+  # Leave blank to deploy without AI (the app still works fully).
   _GEMINI_API_KEY: ''
 
 steps:
-  # Build the container image, inlining the Gemini key at build time so Vite's
-  # `define` block can substitute it into the client bundle.
+  # Step 1 — Build the Docker image.
+  # We tag it with the unique $BUILD_ID so no two builds ever share a tag
+  # and there is no race condition if two submits run close together.
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
       - '--build-arg'
       - 'GEMINI_API_KEY=${_GEMINI_API_KEY}'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/${_SERVICE}'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE}:$BUILD_ID'
       - '.'
 
-  # Push the container image to Container Registry
+  # Step 2 — Push the uniquely-tagged image to Container Registry.
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/${_SERVICE}']
+    args: ['push', 'gcr.io/$PROJECT_ID/${_SERVICE}:$BUILD_ID']
 
-  # Deploy container image to Cloud Run in the existing region (us-west1)
+  # Step 3 — Deploy EXACTLY this build's image to Cloud Run.
+  # Using the $BUILD_ID tag means Cloud Run always gets the image
+  # that was just built in this run, nothing else.
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
@@ -30,7 +33,7 @@ steps:
       - deploy
       - '${_SERVICE}'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/${_SERVICE}'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE}:$BUILD_ID'
       - '--region'
       - '${_REGION}'
       - '--platform'
@@ -40,4 +43,4 @@ steps:
       - 'GEMINI_API_KEY=${_GEMINI_API_KEY}'
 
 images:
-  - 'gcr.io/$PROJECT_ID/${_SERVICE}'
+  - 'gcr.io/$PROJECT_ID/${_SERVICE}:$BUILD_ID'
