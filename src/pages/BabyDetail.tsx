@@ -327,7 +327,7 @@ export default function BabyDetail() {
                 </div>
               </div>
 
-              <TabsList className="grid h-auto w-full gap-3 rounded-none bg-transparent p-0 md:grid-cols-2 xl:grid-cols-4">
+              <TabsList className="grid !h-auto w-full gap-3 rounded-none bg-transparent p-0 group-data-horizontal/tabs:h-auto md:grid-cols-2 xl:grid-cols-4">
                 {primaryHighlights.map((item) => (
                   <ModuleQuickTab
                     key={item.value}
@@ -347,7 +347,7 @@ export default function BabyDetail() {
                   <Stethoscope className="h-4 w-4" />
                   Support areas
                 </div>
-                <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 rounded-none bg-transparent p-0">
+                <TabsList className="flex !h-auto w-full flex-wrap justify-start gap-2 rounded-none bg-transparent p-0 group-data-horizontal/tabs:h-auto">
                   {supportItems.map((tab) => (
                     <ModuleTabTrigger key={tab.value} value={tab.value} label={tab.label} shortLabel={tab.shortLabel} icon={tab.icon} />
                   ))}
