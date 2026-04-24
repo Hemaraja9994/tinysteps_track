@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { format } from 'date-fns';
+import { safeFormat } from '../../lib/utils';
 import { Badge } from '../ui/badge';
 import { motion } from 'motion/react';
 import { Checkbox } from '../ui/checkbox';
@@ -536,7 +537,7 @@ export default function DevelopmentalModule({ baby }: { baby: any }) {
                   </div>
                   <CardTitle className="text-xl font-black tracking-tight text-foreground">{milestone.skill}</CardTitle>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold text-muted-foreground">
-                    <span>{format(new Date(milestone.dateObserved), 'MMMM dd, yyyy')}</span>
+                    <span>{safeFormat(milestone.dateObserved, 'MMMM dd, yyyy')}</span>
                     <span>{milestone.module} therapist</span>
                   </div>
                   {milestone.notes && (

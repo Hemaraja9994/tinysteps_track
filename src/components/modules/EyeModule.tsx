@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { format } from 'date-fns';
 import { Badge } from '../ui/badge';
 import { toast } from 'sonner';
+import { safeFormat } from '../../lib/utils';
 
 type EyeResult = {
   stage: string;
@@ -245,7 +246,7 @@ export default function EyeModule({ baby }: { baby: any }) {
                       {screening.reportStatus || 'Routine surveillance'}
                     </Badge>
                     <Badge variant="outline" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
-                      {format(new Date(screening.date), 'MMMM dd, yyyy')}
+                      {safeFormat(screening.date, 'MMMM dd, yyyy')}
                     </Badge>
                   </div>
                   <CardTitle className="text-2xl font-black tracking-tight text-foreground">
@@ -284,7 +285,7 @@ export default function EyeModule({ baby }: { baby: any }) {
                   Follow-up
                 </div>
                 <div className="mt-3 text-xl font-black tracking-tight text-foreground">
-                  {screening.followUpDate ? format(new Date(screening.followUpDate), 'MMM dd, yyyy') : 'TBD'}
+                  {screening.followUpDate ? safeFormat(screening.followUpDate, 'MMM dd, yyyy', 'TBD') : 'TBD'}
                 </div>
                 <div className="mt-4 text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">Treatment plan</div>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -322,7 +323,7 @@ export default function EyeModule({ baby }: { baby: any }) {
                       <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">Patient</p>
                       <h3 className="mt-1 text-2xl font-black tracking-tight text-foreground">{baby.name}</h3>
                       <p className="mt-2 text-sm font-medium text-muted-foreground">
-                        Exam on {format(new Date(selectedReport.date), 'MMMM dd, yyyy')}
+                        Exam on {safeFormat(selectedReport.date, 'MMMM dd, yyyy')}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -351,7 +352,7 @@ export default function EyeModule({ baby }: { baby: any }) {
                 <div className="grid gap-4 md:grid-cols-3">
                   <MiniInfo title="Examiner" value={selectedReport.examinerName || 'Not recorded'} />
                   <MiniInfo title="Center" value={selectedReport.centerName || 'Not recorded'} />
-                  <MiniInfo title="Follow-up date" value={selectedReport.followUpDate ? format(new Date(selectedReport.followUpDate), 'MMM dd, yyyy') : 'TBD'} />
+                  <MiniInfo title="Follow-up date" value={selectedReport.followUpDate ? safeFormat(selectedReport.followUpDate, 'MMM dd, yyyy', 'TBD') : 'TBD'} />
                 </div>
               </div>
             </>
@@ -580,11 +581,11 @@ function buildReportText(baby: any, report: EyeReport) {
     'RETINAL SCREENING REPORT',
     '',
     `Baby Name: ${baby.name}`,
-    `Date of Birth: ${baby.dob ? format(new Date(baby.dob), 'MMM dd, yyyy') : 'Not recorded'}`,
+    `Date of Birth: ${safeFormat(baby.dob, 'MMM dd, yyyy', 'Not recorded')}`,
     `Gestational Age at Birth: ${baby.gestationalAgeAtBirth ?? 'Not recorded'} weeks`,
     `Birth Weight: ${baby.birthWeight ?? 'Not recorded'} g`,
     '',
-    `Exam Date: ${report.date ? format(new Date(report.date), 'MMM dd, yyyy') : 'Not recorded'}`,
+    `Exam Date: ${safeFormat(report.date, 'MMM dd, yyyy', 'Not recorded')}`,
     `Examiner: ${report.examinerName || 'Not recorded'}`,
     `Center: ${report.centerName || 'Not recorded'}`,
     `Report Status: ${report.reportStatus || 'Routine surveillance'}`,
@@ -603,6 +604,6 @@ function buildReportText(baby: any, report: EyeReport) {
     '',
     `Clinical Impression: ${report.impression || summarizeLegacyReport(report)}`,
     `Treatment / Advice: ${report.treatmentPlan || 'No treatment recorded.'}`,
-    `Follow-up Date: ${report.followUpDate ? format(new Date(report.followUpDate), 'MMM dd, yyyy') : 'TBD'}`,
+    `Follow-up Date: ${report.followUpDate ? safeFormat(report.followUpDate, 'MMM dd, yyyy', 'TBD') : 'TBD'}`,
   ].join('\n');
 }

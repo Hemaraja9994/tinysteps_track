@@ -1,26 +1,43 @@
+substitutions:
+  _REGION: us-west1
+  _SERVICE: tinysteps
+  # Override this at build time:
+  #   gcloud builds submit --substitutions=_GEMINI_API_KEY=your-key
+  # Leave blank to build without AI interpretation support.
+  _GEMINI_API_KEY: ''
+
 steps:
-  # Build the container image
+  # Build the container image, inlining the Gemini key at build time so Vite's
+  # `define` block can substitute it into the client bundle.
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/tinysteps', '.']
-  
+    args:
+      - build
+      - '--build-arg'
+      - 'GEMINI_API_KEY=${_GEMINI_API_KEY}'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE}'
+      - '.'
+
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/tinysteps']
-  
-  # Deploy container image to Cloud Run
+    args: ['push', 'gcr.io/$PROJECT_ID/${_SERVICE}']
+
+  # Deploy container image to Cloud Run in the existing region (us-west1)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
-      - 'run'
-      - 'deploy'
-      - 'tinysteps'
+      - run
+      - deploy
+      - '${_SERVICE}'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/tinysteps'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE}'
       - '--region'
-      - 'asia-south1'
+      - '${_REGION}'
       - '--platform'
-      - 'managed'
+      - managed
       - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'GEMINI_API_KEY=${_GEMINI_API_KEY}'
 
 images:
-  - 'gcr.io/$PROJECT_ID/tinysteps'
+  - 'gcr.io/$PROJECT_ID/${_SERVICE}'

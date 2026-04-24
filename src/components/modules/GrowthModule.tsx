@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
+import { safeFormat } from '../../lib/utils';
 
 const INTERGROWTH_WEIGHT = [
   { week: 24, p3: 450, p10: 500, p50: 600, p90: 750, p97: 850 },
@@ -393,7 +394,7 @@ export default function GrowthModule({ baby }: { baby: any }) {
               <div key={rec.id} className="rounded-[1.35rem] border border-border/60 bg-background/75 p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg dark:bg-slate-900/40">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-[10px] font-black uppercase tracking-[0.22em] text-muted-foreground">{format(new Date(rec.date), 'MMM dd, yyyy')}</div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.22em] text-muted-foreground">{safeFormat(rec.date, 'MMM dd, yyyy')}</div>
                     <div className="mt-2 text-xl font-black tracking-tight text-foreground">
                       {rec[activeMetric] ? `${rec[activeMetric]}${activeMetric === 'weight' ? 'g' : 'cm'}` : '--'}
                     </div>

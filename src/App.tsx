@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import BabyDetail from './pages/BabyDetail';
 import Navbar from './components/layout/Navbar';
 import AppCredits from './components/layout/AppCredits';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, profile, loading } = useAuth();
@@ -28,7 +29,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     <div className="app-shell min-h-screen bg-background transition-colors duration-300">
       <Navbar />
       <main className="container mx-auto px-4 py-6 sm:px-6 sm:py-8">
-        {children}
+        <ErrorBoundary>{children}</ErrorBoundary>
         <AppCredits />
       </main>
     </div>
@@ -37,31 +38,33 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route 
-              path="/" 
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/baby/:id" 
-              element={
-                <ProtectedRoute>
-                  <BabyDetail />
-                </ProtectedRoute>
-              } 
-            />
-          </Routes>
-        </BrowserRouter>
-        <Toaster position="top-right" />
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/baby/:id"
+                element={
+                  <ProtectedRoute>
+                    <BabyDetail />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </BrowserRouter>
+          <Toaster position="top-right" />
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
