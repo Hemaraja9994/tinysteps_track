@@ -9,6 +9,7 @@ import { Heart, Brain, Smile, AlertTriangle, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { format } from 'date-fns';
 import { Badge } from '../ui/badge';
+import { safeFormat } from '../../lib/utils';
 
 export default function MentalHealthModule({ baby }: { baby: any }) {
   const [records, setRecords] = useState<any[]>([]);
@@ -123,7 +124,7 @@ export default function MentalHealthModule({ baby }: { baby: any }) {
             <CardHeader className="p-8 pb-4">
               <div className="flex justify-between items-start">
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">{format(new Date(r.date), 'MMMM dd, yyyy')}</span>
+                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">{safeFormat(r.date, 'MMMM dd, yyyy')}</span>
                   <div className="flex items-center gap-2">
                      <span className="text-2xl font-black text-slate-900 tracking-tighter">Stress Level {r.parentStressLevel}/10</span>
                   </div>

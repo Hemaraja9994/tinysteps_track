@@ -11,7 +11,7 @@ import { PlusCircle, Baby as BabyIcon, ChevronRight, Activity, Calendar, Trash2,
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Badge } from '../components/ui/badge';
-import { format } from 'date-fns';
+import { safeFormat } from '../lib/utils';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import { exportBabiesRegistryCsv, exportDashboardStatsCsv } from '../lib/reporting';
@@ -493,7 +493,7 @@ export default function Dashboard() {
                     <div className="flex items-center justify-between pt-4 border-t border-border">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-bold text-muted-foreground">Born {format(new Date(baby.dob), 'MMM dd')}</span>
+                        <span className="font-bold text-muted-foreground">Born {safeFormat(baby.dob, 'MMM dd', '—')}</span>
                       </div>
                       <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-indigo-600 group-hover:text-white transition-all">
                         <ChevronRight className="w-5 h-5" />

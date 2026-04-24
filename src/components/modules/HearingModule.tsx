@@ -11,6 +11,7 @@ import { Ear, CheckCircle2, AlertCircle, Plus, PhoneCall, AudioWaveform, Clipboa
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { format } from 'date-fns';
 import { motion } from 'motion/react';
+import { safeFormat } from '../../lib/utils';
 
 const REFLEX_KEYS = ['moro', 'rooting', 'babinski', 'palmar', 'plantar'] as const;
 
@@ -239,7 +240,7 @@ export default function HearingModule({ baby }: { baby: any }) {
                       {screening.testType}
                     </Badge>
                   </div>
-                  <CardTitle className="text-2xl font-black tracking-tight text-foreground">{format(new Date(screening.date), 'MMMM dd, yyyy')}</CardTitle>
+                  <CardTitle className="text-2xl font-black tracking-tight text-foreground">{safeFormat(screening.date, 'MMMM dd, yyyy')}</CardTitle>
                 </div>
 
                 <div className={`inline-flex w-fit items-center gap-2 rounded-full px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] ${screening.resultLeft === 'Pass' && screening.resultRight === 'Pass' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>

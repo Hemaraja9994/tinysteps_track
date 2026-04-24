@@ -1,7 +1,12 @@
 node_modules
 dist
 .git
+.claude
+.vscode
+.idea
 .env
 .env.local
+.env.*
+*.log
 README.md
 .gitignore

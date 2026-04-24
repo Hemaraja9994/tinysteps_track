@@ -24,10 +24,10 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
-import { format } from 'date-fns';
 import { motion } from 'motion/react';
 import { Button } from '../components/ui/button';
 import { printComprehensiveReport } from '../lib/reporting';
+import { safeFormat } from '../lib/utils';
 
 import GrowthModule from '../components/modules/GrowthModule';
 import HearingModule from '../components/modules/HearingModule';
@@ -52,8 +52,11 @@ const TAB_ITEMS = [
 const PRIMARY_TABS = ['growth', 'hearing', 'eyes', 'milestones'] as const;
 const SUPPORT_TABS = ['coordination', 'mental', 'vaccine', 'settings'] as const;
 
-function getChronologicalAgeWeeks(date: string) {
-  return Math.max(0, Math.floor((Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24 * 7)));
+function getChronologicalAgeWeeks(date: string | undefined | null) {
+  if (!date) return 0;
+  const t = new Date(date).getTime();
+  if (Number.isNaN(t)) return 0;
+  return Math.max(0, Math.floor((Date.now() - t) / (1000 * 60 * 60 * 24 * 7)));
 }
 
 function formatReviewText(count: number, emptyLabel: string, filledLabel: string) {
@@ -224,9 +227,13 @@ export default function BabyDetail() {
     );
   }
 
-  const currentAgeWeeks = baby.dob ? getChronologicalAgeWeeks(baby.dob) : 0;
-  const correctedAgeWeeks = Math.max(0, currentAgeWeeks - (40 - baby.gestationalAgeAtBirth));
+  const currentAgeWeeks = getChronologicalAgeWeeks(baby.dob);
+  const gaAtBirth = typeof baby.gestationalAgeAtBirth === 'number' ? baby.gestationalAgeAtBirth : 40;
+  const correctedAgeWeeks = Math.max(0, currentAgeWeeks - (40 - gaAtBirth));
   const statusTone = baby.highRiskFactors?.length ? 'priority follow-up' : 'stable follow-up';
+  const dobDisplay = safeFormat(baby.dob, 'MMM dd, yyyy', 'date unavailable');
+  const gaDisplay = typeof baby.gestationalAgeAtBirth === 'number' ? `${baby.gestationalAgeAtBirth} weeks` : '—';
+  const bwDisplay = baby.birthWeight ? `${baby.birthWeight} g` : '—';
   const handlePrintReport = () =>
     printComprehensiveReport({
       baby,
@@ -268,7 +275,7 @@ export default function BabyDetail() {
                   </Badge>
                 </div>
                 <p className="max-w-2xl text-sm font-semibold text-slate-700/80 dark:text-slate-300/85">
-                  Gestational age at birth {baby.gestationalAgeAtBirth} weeks, born on {format(new Date(baby.dob), 'MMM dd, yyyy')}, birth weight {baby.birthWeight} g.
+                  Gestational age at birth {gaDisplay}, born on {dobDisplay}, birth weight {bwDisplay}.
                 </p>
                 <div className="flex flex-wrap gap-3 text-xs font-black uppercase tracking-[0.2em] text-slate-600/75 dark:text-slate-400">
                   <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 dark:bg-slate-900/60">
